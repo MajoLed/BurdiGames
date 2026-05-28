@@ -8,9 +8,8 @@ namespace BurdiGames.Clases
 {
     public class Usuario
     {
-        #region Propiedades
-
         private string _contrasena;
+
         private static int _cantidadUsuarios = 0;
         public string Id { get; private set; }
         public string Nombre { get; set; }
@@ -22,9 +21,7 @@ namespace BurdiGames.Clases
         public bool SesionActiva { get; set; }
         public DateTime FechaRegistro { get; set; }
 
-        public List<Partida> HistorialPartidas { get; set; } //Lista de partidas
-
-        #endregion
+        public List<Partida> HistorialPartidas { get; set; }
 
         public Usuario(string nombre, string contrasenia)
         {

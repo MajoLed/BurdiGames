@@ -1,5 +1,6 @@
 using BurdiGames.Clases;
 using BurdiGames.Clases.Juegos;
+using BurdiGames.Core;
 
 namespace BurdiGames
 {

@@ -51,9 +51,9 @@
             pnlIzquierdo.Controls.Add(lblTitulo);
 
             // ── Panel derecho (formulario) ────────────────────
-            pnlDerecho.BackColor = Color.FromArgb(12, 16, 28);
+            pnlDerecho.BackColor = Color.FromArgb(13, 13, 31);
             pnlDerecho.Location = new Point(380, 0);
-            pnlDerecho.Size = new Size(380, 440);
+            pnlDerecho.Size = new Size(361, 440);
 
             // Label USUARIO
             lblUsuario.Text = "USUARIO";

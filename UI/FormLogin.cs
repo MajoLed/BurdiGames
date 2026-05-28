@@ -21,6 +21,32 @@ namespace BurdiGames
             };
         }
 
+        #region Diseño
+
+        private void Button_Paint(object sender, PaintEventArgs e)
+        {
+            Button btn = (Button)sender;
+            int borderRadius = 15;
+
+            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+
+            GraphicsPath path = new GraphicsPath();
+            path.AddArc(0, 0, borderRadius, borderRadius, 180, 90);
+            path.AddArc(btn.Width - borderRadius, 0, borderRadius, borderRadius, 270, 90);
+            path.AddArc(btn.Width - borderRadius, btn.Height - borderRadius, borderRadius, borderRadius, 0, 90);
+            path.AddArc(0, btn.Height - borderRadius, borderRadius, borderRadius, 90, 90);
+            path.CloseAllFigures();
+
+            btn.Region = new Region(path);
+
+            using (Pen pen = new Pen(btn.FlatAppearance.BorderColor, 2))
+            {
+                e.Graphics.DrawPath(pen, path);
+            }
+        }
+
+        #endregion 
+
         private void btnIniciarSesion_Click(object sender, EventArgs e)
         {
             string nombre = txtUsuario.Text.Trim();

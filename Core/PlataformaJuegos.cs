@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BurdiGames.Clases;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,17 +7,16 @@ using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
-namespace BurdiGames.Clases
+namespace BurdiGames.Core
 {
     public class PlataformaJuegos
     {
-        public Usuario UsuarioActual;
 
         public List<Usuario> Usuarios = new List<Usuario>();
 
         public List<Juego> CatalogoJuegos = new List<Juego>(); //Juegos Disponibles
 
-
+        //Métodos
         public Usuario AutenticarUsuario(string nickname, string contra)
         {
             return Usuarios.FirstOrDefault(u => u.Nombre == nickname && u.Contrasenia == contra);
@@ -40,4 +40,5 @@ namespace BurdiGames.Clases
             }
         }
     }
+
 }

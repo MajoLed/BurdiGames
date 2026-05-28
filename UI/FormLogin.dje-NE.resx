@@ -118,10 +118,122 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="txtUsuario.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Consolas, 13pt</value>
+  </data>
+  <data name="txtUsuario.Location" type="System.Drawing.Point, System.Drawing">
+    <value>40, 122</value>
+  </data>
+  <data name="txtUsuario.Size" type="System.Drawing.Size, System.Drawing">
+    <value>300, 21</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="txtUsuario.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="txtPassword.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Consolas, 13pt</value>
+  </data>
+  <data name="txtPassword.Location" type="System.Drawing.Point, System.Drawing">
+    <value>40, 197</value>
+  </data>
+  <data name="txtPassword.PasswordChar" type="System.Char, mscorlib" xml:space="preserve">
+    <value>•</value>
+  </data>
+  <data name="txtPassword.Size" type="System.Drawing.Size, System.Drawing">
+    <value>300, 21</value>
+  </data>
+  <data name="txtPassword.TabIndex" type="System.Int32, mscorlib">
+    <value>3</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="btnIniciarSesion.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="btnIniciarSesion.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Consolas, 11pt, style=Bold</value>
+  </data>
+  <data name="btnIniciarSesion.Location" type="System.Drawing.Point, System.Drawing">
+    <value>40, 270</value>
+  </data>
+  <data name="btnIniciarSesion.Size" type="System.Drawing.Size, System.Drawing">
+    <value>300, 45</value>
+  </data>
+  <data name="btnIniciarSesion.TabIndex" type="System.Int32, mscorlib">
+    <value>5</value>
+  </data>
+  <data name="btnIniciarSesion.Text" xml:space="preserve">
+    <value>▶  INICIAR SESIÓN</value>
+  </data>
+  <data name="btnRegistrarte.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="btnRegistrarte.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Consolas, 11pt, style=Bold</value>
+  </data>
+  <data name="btnRegistrarte.Location" type="System.Drawing.Point, System.Drawing">
+    <value>40, 328</value>
+  </data>
+  <data name="btnRegistrarte.Size" type="System.Drawing.Size, System.Drawing">
+    <value>300, 55</value>
+  </data>
+  <data name="btnRegistrarte.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="btnRegistrarte.Text" xml:space="preserve">
+    <value> ¿No tienes cuenta? REGISTRATE  </value>
+  </data>
+  <data name="lblTitulo.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Consolas, 22pt, style=Bold</value>
+  </data>
+  <data name="lblTitulo.Location" type="System.Drawing.Point, System.Drawing">
+    <value>10, 180</value>
+  </data>
+  <data name="lblTitulo.Size" type="System.Drawing.Size, System.Drawing">
+    <value>340, 50</value>
+  </data>
+  <data name="lblTitulo.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="lblTitulo.Text" xml:space="preserve">
+    <value>BURDIGAMES</value>
+  </data>
+  <data name="lblTitulo.TextAlign" type="System.Drawing.ContentAlignment, System.Drawing">
+    <value>MiddleCenter</value>
+  </data>
+  <data name="lblUsuario.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Consolas, 9pt</value>
+  </data>
+  <data name="lblUsuario.Size" type="System.Drawing.Size, System.Drawing">
+    <value>300, 18</value>
+  </data>
+  <data name="lblUsuario.Text" xml:space="preserve">
+    <value>USUARIO</value>
+  </data>
+  <data name="lblPassword.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Consolas, 9pt</value>
+  </data>
+  <data name="lblPassword.Size" type="System.Drawing.Size, System.Drawing">
+    <value>300, 18</value>
+  </data>
+  <data name="lblPassword.Text" xml:space="preserve">
+    <value>CONTRASEÑA</value>
+  </data>
+  <data name="lblError.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Consolas, 8pt</value>
+  </data>
+  <data name="lblError.Size" type="System.Drawing.Size, System.Drawing">
+    <value>300, 18</value>
+  </data>
+  <data name="pnlIzquierdo.Size" type="System.Drawing.Size, System.Drawing">
+    <value>360, 440</value>
+  </data>
+  <data name="pnlDerecho.Size" type="System.Drawing.Size, System.Drawing">
+    <value>420, 440</value>
+  </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>760, 440</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="$this.Font" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>

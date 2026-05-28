@@ -10,24 +10,26 @@ namespace BurdiGames.Clases
 {
     public class Partida : IGuardable
     {
-        #region
-            public Usuario Usuario { get; set; }
-            public Juego Juego { get; set; }
-            public int? Puntaje { get; set; }
-            public DateTime? Fecha { get; set; }
+        public Usuario Usuario { get; set; }
+        public Juego Juego { get; set; }
+        public int? Puntaje { get; set; }
+        public DateTime? Fecha { get; set; }
 
-        #endregion
         public Partida(Usuario usuario, Juego juego)
         {
             Usuario = usuario;
             Juego = juego;
             Fecha = DateTime.Now;
         }
+
+        #region Metodos
         public void Guardar() =>
             Console.WriteLine($"Partida de {Usuario.Nombre} en {Juego.Nombre} guardada.");
 
         public void Cargar() =>
             Console.WriteLine($"Partida de {Usuario.Nombre} cargada.");
+
+        #endregion
 
     }
 
