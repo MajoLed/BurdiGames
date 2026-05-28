@@ -8,7 +8,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace BurdiGames.Clases
 {
-    internal class PlataformaJuegos
+    public class PlataformaJuegos
     {
         public Usuario UsuarioActual;
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BurdiGames.Core
 {
-    internal interface IGuardable
+    public interface IGuardable
     {
         void Guardar();
         void Cargar();

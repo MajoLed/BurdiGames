@@ -1,15 +1,42 @@
+using BurdiGames.Clases;
+using BurdiGames.Clases.Juegos;
+
 namespace BurdiGames
 {
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
+
+        public static PlataformaJuegos BurdiGames = new PlataformaJuegos();
+
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
+            //Datos de prueba
+            BurdiGames.RegistrarUsuario("PlayerOne", "1234");
+            BurdiGames.RegistrarUsuario("Majo", "abcd");
+
+            BurdiGames.CatalogoJuegos.Add(new Arcade("Galaxian", "Juego de naves espaciales","Sources/Imagenes/logo_galaxian.png"));
+            BurdiGames.CatalogoJuegos.Add(new RPG("Bomberman", "Aventura RPG pixel art", "Sources/Imagenes/logo_bomberman.png") );
+            BurdiGames.CatalogoJuegos.Add(new Arcade("Puzzle Block", "Bloques y lógica", "Sources/Imagenes/defaultuser.png"));
+
+
+            var playerOne = BurdiGames.AutenticarUsuario("PlayerOne", "1234");
+
+            if (playerOne != null)
+            {
+
+                BurdiGames.CatalogoJuegos.Add(BurdiGames.CatalogoJuegos[0]);
+
+                // Partida de prueba en el historial
+                playerOne.HistorialPartidas.Add(new Partida(playerOne, BurdiGames.CatalogoJuegos[0])
+                {
+                    Puntaje = 12000,
+                    Fecha = DateTime.Now.AddHours(-2)
+                });
+            }
+
+
+            //Iniciar aplicacion
             ApplicationConfiguration.Initialize();
             Application.Run(new FormLogin());
         }

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace BurdiGames.Clases
 {
-    internal abstract class Juego
+    public abstract class Juego
     {
-        private int _id;
         public string Nombre { get; set; }
         public string Genero { get; set; }
         public string Descripcion { get; set; }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BurdiGames.Clases
 {
-    internal class Usuario
+    public class Usuario
     {
         #region Propiedades
 
@@ -39,7 +39,7 @@ namespace BurdiGames.Clases
 
             FechaRegistro = DateTime.Now;
 
-            Avatar = "../Sources/Imagenes/defaultuser.png";
+            Avatar = "Sources/Imagenes/defaultuser.png";
 
             HistorialPartidas = new List<Partida>();
         }
