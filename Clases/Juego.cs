@@ -14,7 +14,7 @@ namespace BurdiGames.Clases
         public string Descripcion { get; set; }
         public string Imagen { get; set; } //url
 
-        //Método: Mostrar info (Progreso, puntaje, ult partida)
+        //Método: Mostrar info especifica (Progreso, puntaje, ult partida)
 
         public Juego(string nombre, string genero, string descripcion, string rutaImagen) 
         {
@@ -23,5 +23,7 @@ namespace BurdiGames.Clases
             Descripcion = descripcion;
             Imagen = rutaImagen;
         }
+
+        public abstract void Jugar(); 
     }
 }

@@ -8,43 +8,43 @@ namespace BurdiGames.Clases
 {
     internal class Usuario
     {
-        #region propiedades
-
-        private static int cantUsuarios;
+        #region Propiedades
 
         private string _contrasena;
+        private static int _cantidadUsuarios = 0;
+        public string Id { get; private set; }
         public string Nombre { get; set; }
-        public string Contrasenia { get { return _contrasena; } } //Solo lectura (Seguridad)
+        public string Contrasenia // Solo lectura para seguridad
+        {
+            get { return _contrasena; }
+        } 
         public string Avatar { get; set; } //url
         public bool SesionActiva { get; set; }
-        public DateTime? FechaRegistro { get; set; }
+        public DateTime FechaRegistro { get; set; }
 
         public List<Partida> HistorialPartidas { get; set; } //Lista de partidas
 
         #endregion
 
-        //Constructor 
-
-        public Usuario(string nombre, string contrasenia, int id = 1)
+        public Usuario(string nombre, string contrasenia)
         {
-            id++;
+            _cantidadUsuarios++;
+            Id = _cantidadUsuarios.ToString("D3");
+
             _contrasena = contrasenia;
+
             Nombre = nombre;
+
             SesionActiva = true;
+
             FechaRegistro = DateTime.Now;
+
             Avatar = "../Sources/Imagenes/defaultuser.png";
+
+            HistorialPartidas = new List<Partida>();
         }
 
         #region Metodos
-        public bool ValidarContrasenia(string contrasenia)
-        {
-            bool validacion;
-
-            if (this.Contrasenia == contrasenia)
-                validacion = true;
-
-            return validacion = false;
-        }
 
         public void CambiarNombre(string nombreNuevo)
         {
