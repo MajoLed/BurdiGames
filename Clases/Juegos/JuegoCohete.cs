@@ -554,7 +554,8 @@ namespace BurdiGames.Clases.Juegos
         public JuegoCoheteArcade()
             : base(
                 nombre: "Cohete Espacial",
-                descripcion: "Esquiva meteoritos rosas y elimina aliens maquillados en el espacio.",
+                descripcion: "Esquiva meteoritos rosas y elimina aliens maquillados en el espacio. utiliza a,d para ir derecha e izquierda" +
+                  "y w, s para ir arriba y abajo. y con Ender Disparas",
                 rutaImagen: "Sources/Imagenes/logo_galaxian.png",
                 vidas: 3)
         {

@@ -225,8 +225,8 @@ namespace BurdiGames.Clases.Juegos
     {
         public JuegoBuscaminasArcade()
             : base(
-                nombre: "Blossom Mines",
-                descripcion: "Buscaminas con estética girlie. Clic izquierdo para revelar, derecho para bandera.",
+                nombre: "Buscaminas",
+                descripcion: "Buscaminas. Clic izquierdo para revelar, derecho para bandera.",
                 rutaImagen: "Sources/Imagenes/defaultuser.png",
                 vidas: 1)
         {

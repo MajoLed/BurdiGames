@@ -695,8 +695,8 @@ namespace BurdiGames.Clases.Juegos
     {
         public JuegoPacman()
             : base(
-                nombre: "Pac-Girl Rosa",
-                descripcion: "Juego arcade estilo Pacman con estética kawaii. Come puntos, evita fantasmas y usa corazones de poder.",
+                nombre: "Pacman Rosa",
+                descripcion: "Juego arcade PacMan Come puntos, evita fantasmas y usa corazones de poder.",
                 rutaImagen: "Sources/Imagenes/logo_galaxian.png",
                 vidas: 3)
         {

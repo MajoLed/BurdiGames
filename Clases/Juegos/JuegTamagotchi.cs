@@ -524,7 +524,7 @@ namespace BurdiGames.Clases.Juegos
         public JuegoTamagotchiWrapper()
             : base(
                 nombre: "Tamagotchi",
-                descripcion: "Cuida tu mascota virtual. ¡Dale de comer, ponla a dormir y juega con ella!",
+                descripcion: "Cuida tu mascota virtual. ¡Dale de comer, ponla a dormir y juega con ella",
                 rutaImagen: "Sources/Imagenes/Tamagotchi/logo.png",
                 vidas: 1)
         { }
