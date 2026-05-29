@@ -26,7 +26,7 @@ namespace BurdiGames.Clases
         public Usuario(string nombre, string contrasenia)
         {
             _cantidadUsuarios++;
-            Id = _cantidadUsuarios.ToString("D3");
+            Id = _cantidadUsuarios.ToString("D3"); // 001, 002, 200, etc.
 
             _contrasena = contrasenia;
 

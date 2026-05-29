@@ -44,6 +44,32 @@ namespace BurdiGames
                 e.Graphics.DrawPath(pen, path);
             }
         }
+        //tablas de ingreso
+        private void TabModo_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            bool activo = e.Index == tabModo.SelectedIndex;
+            var bgColor = activo ? Color.FromArgb(12, 16, 28) : Color.FromArgb(20, 22, 35);
+            var fgColor = activo ? Color.FromArgb(0, 255, 127) : Color.FromArgb(100, 100, 110);
+
+            e.Graphics.FillRectangle(new SolidBrush(bgColor), e.Bounds);
+
+            if (activo)
+            {
+                var lineRect = new Rectangle(e.Bounds.X, e.Bounds.Bottom - 2, e.Bounds.Width, 2);
+                e.Graphics.FillRectangle(new SolidBrush(Color.FromArgb(0, 255, 127)), lineRect);
+            }
+
+            var sf = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
+            };
+            e.Graphics.DrawString(
+                tabModo.TabPages[e.Index].Text,
+                new Font("Consolas", 9f, FontStyle.Bold),
+                new SolidBrush(fgColor),
+                e.Bounds, sf);
+        }
 
         #endregion 
 
@@ -81,6 +107,7 @@ namespace BurdiGames
                 this.Show();
             };
         }
+
 
         private void btnRegistrarte_Click(object sender, EventArgs e)
         {
