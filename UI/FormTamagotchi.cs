@@ -1,670 +1,695 @@
-﻿/*
-using BurdiGames.Clases.Juegos;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Drawing;
-using System.IO;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using Timer = System.Windows.Forms.Timer;
 
-namespace BurdiGames.GUI
+namespace MiniJuegos
 {
-    public class FormTamagotchi : Form
+    // ─── Panel doble buffer ───────────────────────────────────────────────────
+    public class PanelSuaveTamagotchi : Panel
     {
-        // ── Mascota actual ────────────────────────
-        private Mascota _mascota;
-
-        // ── Timers ────────────────────────────────
-        private Timer _timerJuego;        // baja necesidades con el tiempo
-        private Timer _timerAnimacion;    // cicla los frames de la animación
-        private Timer _timerVolverNormal; // después de X segundos vuelve al estado normal
-
-        // ── Estado animación ──────────────────────
-        private int _frameActual = 1;
-        private int _totalFrames = 2;
-
-        // ── Controles principales ─────────────────
-        private PictureBox _picFondo;
-        private PictureBox _picMascota;
-
-        private Panel _panelBarras;
-        private Panel _panelBotonesAccion;
-        private Button _btnVolver;
-        private Label _lblNombreMascota;
-        private Label _lblEstado;
-
-        // Indicadores de necesidades (círculos de color)
-        private Panel _circHambre;
-        private Panel _circHigiene;
-        private Panel _circDiversion;
-        private Panel _circSueno;
-
-        private Label _lblHambre;
-        private Label _lblHigiene;
-        private Label _lblDiversion;
-        private Label _lblSueno;
-
-        // ── Pantalla de selección ─────────────────
-        private Panel _panelSeleccion;
-        private Panel _panelJuego;
-
-        public FormTamagotchi()
+        public PanelSuaveTamagotchi()
         {
-            this.Text = "Tamagotchi — BurdiGames";
-            this.Size = new Size(700, 550);
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.BackColor = Color.FromArgb(15, 15, 30);
-
-            InicializarTimers();
-            MostrarPantallaSeleccion();
+            DoubleBuffered = true;
+            SetStyle(ControlStyles.AllPaintingInWmPaint |
+                     ControlStyles.UserPaint |
+                     ControlStyles.OptimizedDoubleBuffer, true);
+            UpdateStyles();
         }
+    }
 
-        // ────────────────────────────────────────────
-        //  PANTALLA 1: SELECCIÓN DE MASCOTA
-        // ────────────────────────────────────────────
+    // ─── Pantalla de configuración inicial ───────────────────────────────────
+    public class FormConfigTamagotchi : Form
+    {
+        public string NombreMascota { get; private set; } = "Buddy";
+        public TipoMascota Tipo { get; private set; } = TipoMascota.Perro;
+        public GeneroMascota Genero { get; private set; } = GeneroMascota.Nino;
 
-        private void MostrarPantallaSeleccion()
+        private TextBox txtNombre;
+        private Panel panelMascota;
+        private Panel panelGenero;
+        private Button btnJugar;
+        private TipoMascota tipoSelec = TipoMascota.Perro;
+        private GeneroMascota genSelec = GeneroMascota.Nino;
+
+        private static readonly Color C_FONDO = Color.FromArgb(245, 240, 255);
+        private static readonly Color C_ROSA = Color.FromArgb(255, 150, 190);
+        private static readonly Color C_VERDE = Color.FromArgb(160, 230, 180);
+        private static readonly Color C_AZUL = Color.FromArgb(150, 200, 255);
+        private static readonly Color C_MORADO = Color.FromArgb(180, 130, 255);
+        private static readonly Color C_TEXTO = Color.FromArgb(80, 50, 100);
+
+        public FormConfigTamagotchi()
         {
-            this.Controls.Clear();
+            Text = "🐾 ¡Crea tu mascota!";
+            ClientSize = new Size(420, 520);
+            BackColor = C_FONDO;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            StartPosition = FormStartPosition.CenterScreen;
+            Font = new Font("Consolas", 10f);
 
-            _panelSeleccion = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.FromArgb(15, 15, 30)
-            };
-
+            // Título
             var lblTitulo = new Label
             {
-                Text = "¿Con quién quieres jugar?",
-                ForeColor = Color.White,
+                Text = "🌸 TAMAGOTCHI 🌸",
                 Font = new Font("Consolas", 16f, FontStyle.Bold),
+                ForeColor = C_ROSA,
                 AutoSize = true,
-                Left = 0,
-                Top = 40
-            };
-            lblTitulo.Left = (this.ClientSize.Width - 400) / 2;
-
-            var lblSubtitulo = new Label
-            {
-                Text = "Elige tu mascota",
-                ForeColor = Color.Gray,
-                Font = new Font("Consolas", 9f),
-                AutoSize = true,
-                Top = 80
+                Location = new Point(75, 18)
             };
 
-            // Nombre de la mascota
+            // Nombre
             var lblNombre = new Label
             {
                 Text = "Nombre de tu mascota:",
-                ForeColor = Color.LightGray,
-                Font = new Font("Consolas", 9f),
+                ForeColor = C_TEXTO,
                 AutoSize = true,
-                Left = 60,
-                Top = 140
+                Font = new Font("Consolas", 10f, FontStyle.Bold),
+                Location = new Point(30, 65)
             };
-
-            var txtNombre = new TextBox
+            txtNombre = new TextBox
             {
-                Left = 60,
-                Top = 165,
-                Width = 200,
-                BackColor = Color.FromArgb(30, 30, 50),
-                ForeColor = Color.White,
-                Font = new Font("Consolas", 10f),
-                BorderStyle = BorderStyle.FixedSingle,
-                Text = "Mi mascota"
+                Location = new Point(30, 88),
+                Size = new Size(360, 30),
+                Font = new Font("Consolas", 12f),
+                BackColor = Color.White,
+                ForeColor = C_TEXTO,
+                MaxLength = 18,
+                Text = "Buddy"
             };
+            txtNombre.BorderStyle = BorderStyle.FixedSingle;
 
-            // Corralito — 4 opciones de mascota
-            var especies = new[] { ("Gato", "🐱"), ("Perro", "🐶"), ("Pato", "🐥"), ("Zorro", "🦊") };
-            int seleccionIndex = 0;
-            var botonesEspecie = new List<Panel>();
-
-            var lblElige = new Label
+            // Mascota
+            var lblMascota = new Label
             {
-                Text = "Especie:",
-                ForeColor = Color.LightGray,
-                Font = new Font("Consolas", 9f),
+                Text = "Elige tu mascota:",
+                ForeColor = C_TEXTO,
                 AutoSize = true,
-                Left = 60,
-                Top = 220
+                Font = new Font("Consolas", 10f, FontStyle.Bold),
+                Location = new Point(30, 130)
             };
 
-            int xInicio = 60;
-            for (int i = 0; i < especies.Length; i++)
+            panelMascota = new Panel
+            {
+                Location = new Point(30, 155),
+                Size = new Size(360, 100),
+                BackColor = Color.Transparent
+            };
+
+            var mascotas = new (string emoji, string nombre, TipoMascota tipo)[]
+            {
+                ("🐶", "Perro", TipoMascota.Perro),
+                ("🐱", "Gato",  TipoMascota.Gato),
+                ("🐥", "Pato",  TipoMascota.Pato),
+                ("🦊", "Zorro", TipoMascota.Zorro)
+            };
+
+            Button[] btnsMascota = new Button[4];
+            for (int i = 0; i < 4; i++)
             {
                 int idx = i;
-                var (nombre, emoji) = especies[i];
-
-                // PictureBox del animal — aquí pones tu imagen
-                // Por ahora es un panel con emoji; reemplaza con PictureBox + imagen real
-                var picAnimal = new Panel
-                {
-                    Left = xInicio + i * 140,
-                    Top = 250,
-                    Width = 100,
-                    Height = 100,
-                    BackColor = Color.FromArgb(25, 25, 50),
-                    Tag = nombre
-                };
-
-                // REEMPLAZAR: este Label con emoji es el placeholder de la imagen
-                // Cuando tengas las imágenes, cambia esto por un PictureBox con tu .png
-                var lblEmoji = new Label
-                {
-                    Text = emoji,
-                    Font = new Font("Segoe UI Emoji", 28f),
-                    AutoSize = false,
-                    Width = 100,
-                    Height = 70,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    BackColor = Color.Transparent,
-                    Top = 5,
-                    Left = 0
-                };
-
-                var lblNombreEspecie = new Label
-                {
-                    Text = nombre,
-                    ForeColor = idx == 0 ? Color.FromArgb(0, 200, 100) : Color.Gray,
-                    Font = new Font("Consolas", 8f, idx == 0 ? FontStyle.Bold : FontStyle.Regular),
-                    AutoSize = false,
-                    Width = 100,
-                    Height = 20,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    Top = 75,
-                    Left = 0,
-                    Tag = "lbl_" + nombre
-                };
-
-                picAnimal.Controls.Add(lblEmoji);
-                picAnimal.Controls.Add(lblNombreEspecie);
-
-                picAnimal.Click += (s, e) =>
-                {
-                    seleccionIndex = idx;
-                    // Resetear todos los colores
-                    foreach (var btn in botonesEspecie)
-                    {
-                        btn.BackColor = Color.FromArgb(25, 25, 50);
-                        foreach (Control c in btn.Controls)
-                            if (c is Label l) l.ForeColor = Color.Gray;
-                    }
-                    // Marcar el seleccionado
-                    picAnimal.BackColor = Color.FromArgb(0, 50, 30);
-                    lblNombreEspecie.ForeColor = Color.FromArgb(0, 200, 100);
-                };
-
-                lblEmoji.Click += (s, e) => picAnimal.PerformLayout();
-                lblNombreEspecie.Click += (s, e) => picAnimal.PerformLayout();
-
-                botonesEspecie.Add(picAnimal);
-                _panelSeleccion.Controls.Add(picAnimal);
-            }
-
-            // Seleccionar el primero por defecto
-            if (botonesEspecie.Count > 0)
-                botonesEspecie[0].BackColor = Color.FromArgb(0, 50, 30);
-
-            // Botón Empezar
-            var btnEmpezar = new Button
-            {
-                Text = "▶  Empezar",
-                Left = 60,
-                Top = 400,
-                Width = 140,
-                Height = 38,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(0, 200, 100),
-                ForeColor = Color.Black,
-                Font = new Font("Consolas", 10f, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            btnEmpezar.FlatAppearance.BorderSize = 0;
-            btnEmpezar.Click += (s, e) =>
-            {
-                string nombre = string.IsNullOrWhiteSpace(txtNombre.Text) ? "Mi mascota" : txtNombre.Text.Trim();
-                _mascota = CrearMascota(especies[seleccionIndex].Item1, nombre);
-                IniciarJuego();
-            };
-
-            lblSubtitulo.Left = (this.ClientSize.Width - lblSubtitulo.PreferredWidth) / 2;
-
-            _panelSeleccion.Controls.AddRange(new Control[]
-            {
-                lblTitulo, lblSubtitulo, lblNombre, txtNombre, lblElige, btnEmpezar
-            });
-
-            this.Controls.Add(_panelSeleccion);
-        }
-
-        private Mascota CrearMascota(string especie, string nombre)
-        {
-            return especie switch
-            {
-                "Gato" => new Gato(nombre),
-                "Perro" => new Perro(nombre),
-                "Pato" => new Pato(nombre),
-                "Zorro" => new Zorro(nombre),
-                _ => new Gato(nombre)
-            };
-        }
-
-        // ────────────────────────────────────────────
-        //  PANTALLA 2: JUEGO PRINCIPAL
-        // ────────────────────────────────────────────
-
-        private void IniciarJuego()
-        {
-            this.Controls.Clear();
-
-            _panelJuego = new Panel { Dock = DockStyle.Fill };
-            this.Controls.Add(_panelJuego);
-
-            ConstruirInterfazJuego();
-            ActualizarUI();
-
-            _timerJuego.Start();
-        }
-
-        private void ConstruirInterfazJuego()
-        {
-            // ── Fondo (imagen de fondo, cambia según acción) ──────────
-            // REEMPLAZAR: cuando tengas las imágenes de fondo, este PictureBox
-            // las mostrará automáticamente. Por ahora muestra un color sólido.
-            _picFondo = new PictureBox
-            {
-                Dock = DockStyle.Fill,
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                BackColor = Color.FromArgb(20, 30, 50)  // placeholder — reemplazar con imagen
-            };
-            _panelJuego.Controls.Add(_picFondo);
-
-            // ── Imagen de la mascota (centro) ─────────────────────────
-            // REEMPLAZAR: este PictureBox es donde va la imagen real de tu mascota.
-            // Tendrá tamaño 200x200 centrado. El código ya carga el archivo correcto
-            // según la acción y el frame. Solo sube tus imágenes a la ruta indicada.
-            _picMascota = new PictureBox
-            {
-                Width = 200,
-                Height = 200,
-                Left = (this.ClientSize.Width - 200) / 2,
-                Top = 150,
-                SizeMode = PictureBoxSizeMode.Zoom,
-                BackColor = Color.Transparent
-            };
-            _panelJuego.Controls.Add(_picMascota);
-            _picMascota.BringToFront();
-
-            // ── Nombre y estado ───────────────────────────────────────
-            _lblNombreMascota = new Label
-            {
-                Text = _mascota.Nombre,
-                ForeColor = Color.White,
-                Font = new Font("Consolas", 13f, FontStyle.Bold),
-                AutoSize = true,
-                Top = 110,
-                BackColor = Color.Transparent
-            };
-            _panelJuego.Controls.Add(_lblNombreMascota);
-            _lblNombreMascota.Left = (this.ClientSize.Width - _lblNombreMascota.PreferredWidth) / 2;
-            _lblNombreMascota.BringToFront();
-
-            _lblEstado = new Label
-            {
-                Text = "😊 Saludable",
-                ForeColor = Color.FromArgb(0, 200, 100),
-                Font = new Font("Consolas", 8f),
-                AutoSize = true,
-                Top = 135,
-                BackColor = Color.Transparent
-            };
-            _panelJuego.Controls.Add(_lblEstado);
-            _lblEstado.Left = (this.ClientSize.Width - 120) / 2;
-            _lblEstado.BringToFront();
-
-            // ── Panel de barras (necesidades) — lado derecho ──────────
-            _panelBarras = new Panel
-            {
-                Width = 120,
-                Height = 300,
-                Left = this.ClientSize.Width - 140,
-                Top = 80,
-                BackColor = Color.Transparent
-            };
-            _panelJuego.Controls.Add(_panelBarras);
-            _panelBarras.BringToFront();
-
-            ConstruirIndicadorNecesidad("Hambre", 0, ref _circHambre, ref _lblHambre);
-            ConstruirIndicadorNecesidad("Higiene", 70, ref _circHigiene, ref _lblHigiene);
-            ConstruirIndicadorNecesidad("Diversión", 140, ref _circDiversion, ref _lblDiversion);
-            ConstruirIndicadorNecesidad("Sueño", 210, ref _circSueno, ref _lblSueno);
-
-            // ── Botones de acción — parte inferior ────────────────────
-            _panelBotonesAccion = new Panel
-            {
-                Height = 70,
-                Dock = DockStyle.Bottom,
-                BackColor = Color.FromArgb(10, 10, 25)
-            };
-            _panelJuego.Controls.Add(_panelBotonesAccion);
-            _panelBotonesAccion.BringToFront();
-
-            var acciones = new[]
-            {
-                ("🍖 Alimentar", (Action)(() => EjecutarAccion(() => _mascota.Alimentar(), 3000))),
-                ("🛁 Bañar",     (Action)(() => EjecutarAccion(() => _mascota.Bañar(),     3000))),
-                ("🎾 Jugar",     (Action)(() => EjecutarAccion(() => _mascota.Jugar(),      3000))),
-                ("😴 Dormir",    (Action)(() => EjecutarAccion(() => _mascota.Dormir(),     4000)))
-            };
-
-            int xBtn = 20;
-            foreach (var (texto, accion) in acciones)
-            {
-                var accionLocal = accion;
                 var btn = new Button
                 {
-                    Text = texto,
-                    Left = xBtn,
-                    Top = 15,
-                    Width = 130,
-                    Height = 40,
+                    Text = mascotas[i].emoji + "\n" + mascotas[i].nombre,
+                    Size = new Size(82, 80),
+                    Location = new Point(i * 90, 0),
                     FlatStyle = FlatStyle.Flat,
-                    BackColor = Color.FromArgb(30, 30, 55),
-                    ForeColor = Color.White,
-                    Font = new Font("Consolas", 9f),
-                    Cursor = Cursors.Hand
+                    BackColor = i == 0 ? C_VERDE : Color.White,
+                    ForeColor = C_TEXTO,
+                    Font = new Font("Segoe UI Emoji", 9f, FontStyle.Bold),
+                    Cursor = Cursors.Hand,
+                    Tag = mascotas[i].tipo
                 };
-                btn.FlatAppearance.BorderColor = Color.FromArgb(0, 200, 100);
-                btn.FlatAppearance.BorderSize = 1;
-                btn.Click += (s, e) => accionLocal();
-                _panelBotonesAccion.Controls.Add(btn);
-                xBtn += 145;
+                btn.FlatAppearance.BorderColor = C_MORADO;
+                btn.FlatAppearance.BorderSize = 2;
+                btn.Click += (s, e) =>
+                {
+                    tipoSelec = mascotas[idx].tipo;
+                    foreach (Button b in btnsMascota)
+                        b.BackColor = Color.White;
+                    btn.BackColor = C_VERDE;
+                };
+                btnsMascota[i] = btn;
+                panelMascota.Controls.Add(btn);
             }
 
-            // ── Botón volver al menú ──────────────────────────────────
-            _btnVolver = new Button
+            // Género
+            var lblGenero = new Label
             {
-                Text = "← Menú",
-                Left = 10,
-                Top = 10,
-                Width = 80,
-                Height = 28,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.Transparent,
-                ForeColor = Color.Gray,
-                Font = new Font("Consolas", 8f),
-                Cursor = Cursors.Hand
-            };
-            _btnVolver.FlatAppearance.BorderSize = 0;
-            _btnVolver.Click += (s, e) =>
-            {
-                _timerJuego.Stop();
-                _timerAnimacion.Stop();
-                _timerVolverNormal.Stop();
-                this.Close();
-            };
-            _panelJuego.Controls.Add(_btnVolver);
-            _btnVolver.BringToFront();
-        }
-
-        private void ConstruirIndicadorNecesidad(string nombre, int top,
-            ref Panel circulo, ref Label etiqueta)
-        {
-            var lbl = new Label
-            {
-                Text = nombre,
-                ForeColor = Color.LightGray,
-                Font = new Font("Consolas", 7f),
+                Text = "Género:",
+                ForeColor = C_TEXTO,
                 AutoSize = true,
-                Left = 0,
-                Top = top
+                Font = new Font("Consolas", 10f, FontStyle.Bold),
+                Location = new Point(30, 270)
             };
-
-            // El círculo de color — Panel redondo con esquinas redondeadas
-            // REEMPLAZAR: si prefieres otra representación visual (barra, ícono, etc.)
-            // solo cambia este Panel por otro control
-            var circ = new Panel
+            panelGenero = new Panel
             {
-                Width = 30,
-                Height = 30,
-                Left = 0,
-                Top = top + 18,
-                BackColor = Color.FromArgb(0, 200, 100)
-            };
-
-            // Hacer el panel circular con región
-            circ.Paint += (s, e) =>
-            {
-                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                using var brush = new SolidBrush(circ.BackColor);
-                e.Graphics.FillEllipse(brush, 0, 0, circ.Width - 1, circ.Height - 1);
-            };
-            circ.BackColor = Color.Transparent; // necesario para que se vea solo el paint
-
-            var lblPct = new Label
-            {
-                Text = "70%",
-                ForeColor = Color.White,
-                Font = new Font("Consolas", 6f),
-                AutoSize = false,
-                Width = 80,
-                Height = 14,
-                Left = 35,
-                Top = top + 26,
+                Location = new Point(30, 295),
+                Size = new Size(360, 55),
                 BackColor = Color.Transparent
             };
 
-            circulo = circ;
-            etiqueta = lblPct;
-
-            _panelBarras.Controls.AddRange(new Control[] { lbl, circ, lblPct });
-        }
-
-        // ────────────────────────────────────────────
-        //  LÓGICA DE JUEGO
-        // ────────────────────────────────────────────
-
-        private void EjecutarAccion(Action accionMascota, int duracionMs)
-        {
-            if (_mascota == null || !_mascota.EstaViva) return;
-
-            _timerVolverNormal.Stop();
-            _timerAnimacion.Stop();
-            _frameActual = 1;
-
-            accionMascota(); // llama a Alimentar(), Bañar(), etc.
-            _totalFrames = _mascota.FramesPorAccion(_mascota.AccionActual);
-
-            ActualizarUI();
-            _timerAnimacion.Start();
-
-            // Después de duracionMs milisegundos, vuelve al estado normal
-            _timerVolverNormal.Interval = duracionMs;
-            _timerVolverNormal.Start();
-        }
-
-        private void InicializarTimers()
-        {
-            // Timer principal — baja necesidades cada 5 segundos
-            _timerJuego = new Timer { Interval = 5000 };
-            _timerJuego.Tick += (s, e) =>
+            var btnNino = new Button
             {
-                _mascota?.PasarTiempo();
-                ActualizarUI();
+                Text = "♂  Niño",
+                Size = new Size(170, 46),
+                Location = new Point(0, 0),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = C_AZUL,
+                ForeColor = C_TEXTO,
+                Font = new Font("Consolas", 11f, FontStyle.Bold),
+                Cursor = Cursors.Hand
+            };
+            btnNino.FlatAppearance.BorderColor = C_MORADO;
+            btnNino.FlatAppearance.BorderSize = 2;
 
-                if (_mascota != null && !_mascota.EstaViva)
-                    MostrarMuertesMascota();
+            var btnNina = new Button
+            {
+                Text = "♀  Niña",
+                Size = new Size(170, 46),
+                Location = new Point(185, 0),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.White,
+                ForeColor = C_TEXTO,
+                Font = new Font("Consolas", 11f, FontStyle.Bold),
+                Cursor = Cursors.Hand
+            };
+            btnNina.FlatAppearance.BorderColor = C_MORADO;
+            btnNina.FlatAppearance.BorderSize = 2;
+
+            btnNino.Click += (s, e) =>
+            {
+                genSelec = GeneroMascota.Nino;
+                btnNino.BackColor = C_AZUL;
+                btnNina.BackColor = Color.White;
+            };
+            btnNina.Click += (s, e) =>
+            {
+                genSelec = GeneroMascota.Nina;
+                btnNina.BackColor = C_ROSA;
+                btnNino.BackColor = Color.White;
             };
 
-            // Timer de animación — cambia frame cada 300ms
-            _timerAnimacion = new Timer { Interval = 300 };
-            _timerAnimacion.Tick += (s, e) =>
+            panelGenero.Controls.AddRange(new Control[] { btnNino, btnNina });
+
+            // Vista previa dibujada
+            var panelPreview = new PanelSuaveTamagotchi
             {
-                _frameActual = (_frameActual % _totalFrames) + 1;
-                CargarImagenMascota();
+                Location = new Point(145, 365),
+                Size = new Size(130, 100),
+                BackColor = Color.Transparent
+            };
+            panelPreview.Paint += (s, e) =>
+            {
+                e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                var tmpMascota = new Mascota(
+                    txtNombre.Text.Length > 0 ? txtNombre.Text : "?",
+                    tipoSelec, genSelec);
+                DibujadorMascota.Dibujar(e.Graphics, tmpMascota, 65, 85);
             };
 
-            // Timer volver a normal
-            _timerVolverNormal = new Timer();
-            _timerVolverNormal.Tick += (s, e) =>
+            // Refrescar preview al cambiar nombre o mascota
+            txtNombre.TextChanged += (s, e) => panelPreview.Invalidate();
+            foreach (Button b in btnsMascota)
+                b.Click += (s, e) => panelPreview.Invalidate();
+            btnNino.Click += (s, e) => panelPreview.Invalidate();
+            btnNina.Click += (s, e) => panelPreview.Invalidate();
+
+            // Botón jugar
+            btnJugar = new Button
             {
-                _timerVolverNormal.Stop();
-                _timerAnimacion.Stop();
-                _mascota?.VolvserANormal();
-                _frameActual = 1;
-                ActualizarUI();
+                Text = "▶  ¡JUGAR!",
+                Location = new Point(110, 475),
+                Size = new Size(200, 42),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = C_ROSA,
+                ForeColor = Color.White,
+                Font = new Font("Consolas", 13f, FontStyle.Bold),
+                Cursor = Cursors.Hand
             };
+            btnJugar.FlatAppearance.BorderColor = C_MORADO;
+            btnJugar.FlatAppearance.BorderSize = 2;
+            btnJugar.Click += (s, e) =>
+            {
+                NombreMascota = txtNombre.Text.Trim().Length > 0 ? txtNombre.Text.Trim() : "Buddy";
+                Tipo = tipoSelec;
+                Genero = genSelec;
+                DialogResult = DialogResult.OK;
+                Close();
+            };
+
+            Controls.AddRange(new Control[]
+            {
+                lblTitulo, lblNombre, txtNombre,
+                lblMascota, panelMascota,
+                lblGenero, panelGenero,
+                panelPreview, btnJugar
+            });
+        }
+    }
+
+    // ─── Form principal del Tamagotchi ────────────────────────────────────────
+    public class FormTamagotchi : Form
+    {
+        private Mascota mascota;
+        private System.Windows.Forms.Timer timerJuego;
+
+        private PanelSuaveTamagotchi panelJuego;
+        private Button btnPausa;
+        private Button btnReiniciar;
+        private Label lblNombre;
+        private Label lblMensaje;
+
+        // Barras de estado
+        private Label lblBarraHambre;
+        private Label lblBarraEnergia;
+        private Label lblBarraFelicidad;
+        private ProgressBar barHambre;
+        private ProgressBar barEnergia;
+        private ProgressBar barFelicidad;
+
+        // Botones de acción
+        private Button btnComer;
+        private Button btnDormir;
+        private Button btnJugar;
+
+        // Paleta pastel
+        private static readonly Color C_FONDO = Color.FromArgb(235, 248, 255);
+        private static readonly Color C_HUD = Color.FromArgb(210, 235, 255);
+        private static readonly Color C_PANEL = Color.FromArgb(225, 255, 235);
+        private static readonly Color C_ROSA = Color.FromArgb(255, 150, 190);
+        private static readonly Color C_VERDE = Color.FromArgb(130, 210, 160);
+        private static readonly Color C_AZUL = Color.FromArgb(100, 180, 255);
+        private static readonly Color C_MORADO = Color.FromArgb(180, 130, 255);
+        private static readonly Color C_TEXTO = Color.FromArgb(70, 50, 100);
+        private static readonly Color C_NEON_ROSA = Color.FromArgb(255, 100, 160);
+
+        private float timerParticulas = 0f;
+        private readonly System.Collections.Generic.List<(float x, float y, float vy, Color c, float vida)> burbujas = new();
+        private static readonly Random rng = new Random();
+
+        // ── Constructor ───────────────────────────────────────────────────────
+        public FormTamagotchi()
+        {
+            // Mostrar configuración primero
+            using var cfg = new FormConfigTamagotchi();
+            if (cfg.ShowDialog() != DialogResult.OK)
+            {
+                Close();
+                return;
+            }
+
+            mascota = new Mascota(cfg.NombreMascota, cfg.Tipo, cfg.Genero);
+            mascota.MascotaEscapo += (s, e) => MostrarEscapo();
+
+            InicializarComponentes();
+
+            timerJuego = new System.Windows.Forms.Timer { Interval = 33 };
+            timerJuego.Tick += GameLoop;
+            timerJuego.Start();
+
+            panelJuego.Focus();
         }
 
-        private void ActualizarUI()
+        private void InicializarComponentes()
         {
-            if (_mascota == null) return;
+            Text = $"🐾 {mascota.Nombre}";
+            ClientSize = new Size(480, 620);
+            BackColor = C_FONDO;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            StartPosition = FormStartPosition.CenterScreen;
+            Font = new Font("Consolas", 9f, FontStyle.Bold);
 
-            // Actualizar imagen de fondo
-            CargarImagenFondo();
-
-            // Actualizar imagen de la mascota
-            CargarImagenMascota();
-
-            // Actualizar indicadores de necesidades
-            ActualizarCirculo(_circHambre, _lblHambre, _mascota.Hambre);
-            ActualizarCirculo(_circHigiene, _lblHigiene, _mascota.Higiene);
-            ActualizarCirculo(_circDiversion, _lblDiversion, _mascota.Diversion);
-            ActualizarCirculo(_circSueno, _lblSueno, _mascota.Sueno);
-
-            // Actualizar etiqueta de estado
-            if (_lblEstado != null)
+            // ── HUD superior ─────────────────────────────────────────────────
+            var panelHud = new Panel
             {
-                var estado = _mascota.ObtenerEstadoSalud();
-                (_lblEstado.Text, _lblEstado.ForeColor) = estado switch
+                Location = new Point(0, 0),
+                Size = new Size(480, 70),
+                BackColor = C_HUD
+            };
+            panelHud.Paint += (s, e) =>
+            {
+                using var pen = new Pen(C_NEON_ROSA, 2f);
+                using var glow = new Pen(Color.FromArgb(60, 255, 100, 160), 6f);
+                e.Graphics.DrawLine(pen, 0, 69, 480, 69);
+                e.Graphics.DrawLine(glow, 0, 68, 480, 68);
+            };
+
+            lblNombre = new Label
+            {
+                Text = mascota.Nombre.ToUpper(),
+                ForeColor = C_TEXTO,
+                BackColor = Color.Transparent,
+                Font = new Font("Consolas", 13f, FontStyle.Bold),
+                AutoSize = true,
+                Location = new Point(14, 10)
+            };
+
+            var lblEdad = new Label
+            {
+                Text = "🐾 TAMAGOTCHI",
+                ForeColor = C_MORADO,
+                BackColor = Color.Transparent,
+                Font = new Font("Consolas", 9f),
+                AutoSize = true,
+                Location = new Point(14, 40)
+            };
+
+            btnPausa = new Button
+            {
+                Text = "⏸ PAUSA",
+                Location = new Point(260, 10),
+                Size = new Size(100, 34),
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.White,
+                BackColor = C_MORADO,
+                Cursor = Cursors.Hand,
+                Font = new Font("Consolas", 8.5f, FontStyle.Bold)
+            };
+            btnPausa.FlatAppearance.BorderColor = Color.FromArgb(150, 80, 230);
+            btnPausa.FlatAppearance.BorderSize = 1;
+            btnPausa.MouseEnter += (s, e) => btnPausa.BackColor = Color.FromArgb(210, 160, 255);
+            btnPausa.MouseLeave += (s, e) => btnPausa.BackColor = C_MORADO;
+            btnPausa.Click += (s, e) =>
+            {
+                if (timerJuego.Enabled) { timerJuego.Stop(); btnPausa.Text = "▶ SEGUIR"; }
+                else { timerJuego.Start(); btnPausa.Text = "⏸ PAUSA"; }
+                panelJuego.Focus();
+            };
+
+            btnReiniciar = new Button
+            {
+                Text = "↺ RESET",
+                Location = new Point(370, 10),
+                Size = new Size(100, 34),
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.White,
+                BackColor = C_ROSA,
+                Cursor = Cursors.Hand,
+                Font = new Font("Consolas", 8.5f, FontStyle.Bold)
+            };
+            btnReiniciar.FlatAppearance.BorderColor = C_NEON_ROSA;
+            btnReiniciar.FlatAppearance.BorderSize = 1;
+            btnReiniciar.MouseEnter += (s, e) => btnReiniciar.BackColor = Color.FromArgb(255, 180, 210);
+            btnReiniciar.MouseLeave += (s, e) => btnReiniciar.BackColor = C_ROSA;
+            btnReiniciar.Click += (s, e) =>
+            {
+                using var cfg = new FormConfigTamagotchi();
+                if (cfg.ShowDialog() == DialogResult.OK)
                 {
-                    EstadoSalud.Saludable => ("😊 Saludable", Color.FromArgb(0, 200, 100)),
-                    EstadoSalud.Regular => ("😐 Regular", Color.Yellow),
-                    EstadoSalud.Critico => ("😰 ¡Crítico!", Color.OrangeRed),
-                    EstadoSalud.Muerta => ("💀 Murió", Color.Gray),
-                    _ => ("", Color.White)
+                    mascota = new Mascota(cfg.NombreMascota, cfg.Tipo, cfg.Genero);
+                    mascota.MascotaEscapo += (s2, e2) => MostrarEscapo();
+                    lblNombre.Text = mascota.Nombre.ToUpper();
+                    btnPausa.Text = "⏸ PAUSA";
+                    btnPausa.Enabled = true;
+                    timerJuego.Start();
+                    burbujas.Clear();
+                }
+                panelJuego.Focus();
+            };
+
+            panelHud.Controls.AddRange(new Control[] { lblNombre, lblEdad, btnPausa, btnReiniciar });
+
+            // ── Panel de juego ────────────────────────────────────────────────
+            panelJuego = new PanelSuaveTamagotchi
+            {
+                Location = new Point(0, 70),
+                Size = new Size(480, 280),
+                BackColor = C_PANEL
+            };
+            panelJuego.Paint += PanelJuego_Paint;
+
+            // ── Mensaje de estado ─────────────────────────────────────────────
+            lblMensaje = new Label
+            {
+                Text = "",
+                ForeColor = C_TEXTO,
+                BackColor = Color.FromArgb(200, 255, 255, 255),
+                Font = new Font("Consolas", 10f, FontStyle.Bold),
+                AutoSize = false,
+                Size = new Size(480, 30),
+                Location = new Point(0, 350),
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            // ── Barras de estadísticas ────────────────────────────────────────
+            var panelStats = new Panel
+            {
+                Location = new Point(0, 385),
+                Size = new Size(480, 110),
+                BackColor = Color.FromArgb(240, 250, 255)
+            };
+
+            (string emoji, string label, Color color)[] stats =
+            {
+                ("🍎", "HAMBRE",    C_ROSA),
+                ("⚡", "ENERGÍA",   C_AZUL),
+                ("🌸", "FELICIDAD", C_VERDE)
+            };
+
+            var bars = new ProgressBar[3];
+            var barLabels = new Label[3];
+
+            for (int i = 0; i < 3; i++)
+            {
+                int idx = i;
+                barLabels[i] = new Label
+                {
+                    Text = stats[i].emoji + " " + stats[i].label,
+                    ForeColor = C_TEXTO,
+                    BackColor = Color.Transparent,
+                    Font = new Font("Consolas", 9f, FontStyle.Bold),
+                    AutoSize = true,
+                    Location = new Point(16, 8 + i * 32)
                 };
-
-                // Mostrar alerta de necesidad urgente si está en crítico
-                if (estado == EstadoSalud.Critico)
-                    _lblEstado.Text += $" — {_mascota.NecesidadMasUrgente()} urgente";
+                bars[i] = new ProgressBar
+                {
+                    Location = new Point(130, 8 + i * 32),
+                    Size = new Size(300, 20),
+                    Minimum = 0,
+                    Maximum = 100,
+                    Value = 80,
+                    Style = ProgressBarStyle.Continuous
+                };
+                // Color de la barra con la paleta
+                bars[i].ForeColor = stats[i].color;
+                panelStats.Controls.Add(barLabels[i]);
+                panelStats.Controls.Add(bars[i]);
             }
-        }
 
-        private void ActualizarCirculo(Panel circulo, Label etiqueta, int valor)
-        {
-            if (circulo == null || etiqueta == null) return;
+            barHambre = bars[0];
+            barEnergia = bars[1];
+            barFelicidad = bars[2];
 
-            // Color según el porcentaje
-            Color color = valor switch
+            // ── Botones de acción ─────────────────────────────────────────────
+            var panelAcciones = new Panel
             {
-                > 70 => Color.FromArgb(0, 200, 100),   // verde — saludable
-                > 30 => Color.FromArgb(255, 200, 0),   // amarillo — regular
-                _ => Color.FromArgb(220, 50, 50)    // rojo — crítico
+                Location = new Point(0, 500),
+                Size = new Size(480, 118),
+                BackColor = C_HUD
+            };
+            panelAcciones.Paint += (s, e) =>
+            {
+                using var pen = new Pen(C_NEON_ROSA, 2f);
+                e.Graphics.DrawLine(pen, 0, 0, 480, 0);
             };
 
-            // Forzar repintado con el nuevo color
-            circulo.Tag = color;
-            circulo.Invalidate();
-            circulo.Paint -= CirculoPaint; // evitar handlers acumulados
-            circulo.Paint += CirculoPaint;
-
-            etiqueta.Text = $"{valor}%";
-        }
-
-        private void CirculoPaint(object sender, PaintEventArgs e)
-        {
-            if (sender is Panel p && p.Tag is Color color)
+            (string texto, Color color, Action accion)[] acciones =
             {
-                e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                using var brush = new SolidBrush(color);
-                e.Graphics.FillEllipse(brush, 1, 1, p.Width - 3, p.Height - 3);
-            }
-        }
+                ("🍎\nCOMER",    C_ROSA,   () => mascota.AccionComer()),
+                ("💤\nDORMIR",  C_AZUL,   () => mascota.AccionDormir()),
+                ("🎮\nJUGAR",   C_VERDE,  () => mascota.AccionJugar())
+            };
 
-        private void CargarImagenMascota()
-        {
-            if (_picMascota == null || _mascota == null) return;
-
-            string ruta = _mascota.ObtenerRutaImagen(_frameActual);
-
-            // Si la imagen existe la carga, si no deja el PictureBox vacío
-            // Cuando subas tus imágenes, automáticamente empezarán a aparecer
-            if (File.Exists(ruta))
+            for (int i = 0; i < 3; i++)
             {
-                try
+                int idx = i;
+                Color colorBtn = acciones[i].color;
+                var btn = new Button
                 {
-                    _picMascota.Image?.Dispose();
-                    _picMascota.Image = Image.FromFile(ruta);
-                }
-                catch { /* imagen corrupta o bloqueada — se ignora */   /*}           */
-
-
-
-
-/*
-
-            }
-            else
-            {
-                // Placeholder visual mientras no hay imagen
-                // REEMPLAZAR: cuando subas tus imágenes desaparece solo
-                _picMascota.BackColor = Color.FromArgb(30, 30, 60);
-            }
-        }
-
-        private void CargarImagenFondo()
-        {
-            if (_picFondo == null || _mascota == null) return;
-
-            string ruta = _mascota.ObtenerRutaFondo();
-
-            if (File.Exists(ruta))
-            {
-                try
+                    Text = acciones[i].texto,
+                    Location = new Point(20 + i * 150, 12),
+                    Size = new Size(130, 88),
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = colorBtn,
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI Emoji", 13f, FontStyle.Bold),
+                    Cursor = Cursors.Hand
+                };
+                btn.FlatAppearance.BorderColor = C_MORADO;
+                btn.FlatAppearance.BorderSize = 2;
+                btn.MouseEnter += (s, e) => btn.BackColor = ControlPaint.Light(colorBtn, 0.3f);
+                btn.MouseLeave += (s, e) => btn.BackColor = colorBtn;
+                btn.Click += (s, e) =>
                 {
-                    _picFondo.Image?.Dispose();
-                    _picFondo.Image = Image.FromFile(ruta);
-                }
-                catch { }
+                    acciones[idx].accion();
+                    panelJuego.Focus();
+                };
+                panelAcciones.Controls.Add(btn);
+                if (i == 0) btnComer = btn;
+                if (i == 1) btnDormir = btn;
+                if (i == 2) btnJugar = btn;
             }
+
+            Controls.AddRange(new Control[]
+            {
+                panelHud, panelJuego, lblMensaje, panelStats, panelAcciones
+            });
         }
 
-        private void MostrarMuertesMascota()
+        // ── Game loop ─────────────────────────────────────────────────────────
+        private DateTime ultimoFrame = DateTime.Now;
+
+        private void GameLoop(object? sender, EventArgs e)
         {
-            _timerJuego.Stop();
-            _timerAnimacion.Stop();
-            _timerVolverNormal.Stop();
+            var ahora = DateTime.Now;
+            float delta = (float)(ahora - ultimoFrame).TotalSeconds;
+            ultimoFrame = ahora;
+            delta = Math.Min(delta, 0.05f);
 
-            ActualizarUI();
+            mascota.Actualizar(delta);
 
-            var resultado = MessageBox.Show(
-                $"💀 {_mascota.Nombre} no pudo sobrevivir...\n\n" +
-                $"Tiempo crítico: {_mascota.PorcentajeTiempoCritico():F0}% del tiempo\n\n" +
-                "¿Quieres intentarlo de nuevo?",
-                "Game Over",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-            );
+            // Actualizar barras
+            barHambre.Value = (int)Math.Clamp(mascota.Stats.Hambre, 0, 100);
+            barEnergia.Value = (int)Math.Clamp(mascota.Stats.Energia, 0, 100);
+            barFelicidad.Value = (int)Math.Clamp(mascota.Stats.Felicidad, 0, 100);
 
-            if (resultado == DialogResult.Yes)
-                MostrarPantallaSeleccion();
-            else
-                this.Close();
+            // Mensaje
+            lblMensaje.Text = mascota.ObtenerMensaje();
+
+            // Burbujas decorativas
+            timerParticulas += delta;
+            if (timerParticulas >= 0.4f)
+            {
+                timerParticulas = 0f;
+                Color[] coloresBurbuja = { C_ROSA, C_AZUL, C_VERDE, C_MORADO };
+                burbujas.Add((
+                    rng.Next(20, 460),
+                    290f,
+                    rng.NextSingle() * 30f + 20f,
+                    coloresBurbuja[rng.Next(coloresBurbuja.Length)],
+                    1.5f));
+            }
+
+            for (int i = burbujas.Count - 1; i >= 0; i--)
+            {
+                var b = burbujas[i];
+                float vida = b.vida - delta;
+                if (vida <= 0 || b.y < 70) { burbujas.RemoveAt(i); continue; }
+                burbujas[i] = (b.x, b.y - b.vy * delta, b.vy, b.c, vida);
+            }
+
+            panelJuego.Invalidate();
         }
 
-        protected override void OnFormClosed(FormClosedEventArgs e)
+        // ── Pintar panel de juego ─────────────────────────────────────────────
+        private void PanelJuego_Paint(object? sender, PaintEventArgs e)
         {
-            _timerJuego?.Stop();
-            _timerAnimacion?.Stop();
-            _timerVolverNormal?.Stop();
-            base.OnFormClosed(e);
+            var g = e.Graphics;
+            g.SmoothingMode = SmoothingMode.AntiAlias;
+
+            // Fondo degradado pastel
+            using var fondo = new LinearGradientBrush(
+                new Point(0, 0), new Point(0, panelJuego.Height),
+                Color.FromArgb(220, 245, 255),
+                Color.FromArgb(235, 255, 235));
+            g.FillRectangle(fondo, 0, 0, panelJuego.Width, panelJuego.Height);
+
+            // Suelo
+            using var brSuelo = new SolidBrush(Color.FromArgb(180, 230, 200));
+            g.FillRectangle(brSuelo, 0, panelJuego.Height - 30, panelJuego.Width, 30);
+            using var penSuelo = new Pen(Color.FromArgb(140, 200, 160), 2f);
+            g.DrawLine(penSuelo, 0, panelJuego.Height - 30, panelJuego.Width, panelJuego.Height - 30);
+
+            // Nubes decorativas
+            DibujarNube(g, 60, 35, 0.8f);
+            DibujarNube(g, 340, 20, 1.0f);
+            DibujarNube(g, 190, 50, 0.6f);
+
+            // Burbujas
+            foreach (var (bx, by, _, bc, bvida) in burbujas)
+            {
+                int alpha = (int)(bvida / 1.5f * 130);
+                using var brB = new SolidBrush(Color.FromArgb(Math.Clamp(alpha, 0, 130), bc));
+                using var penB = new Pen(Color.FromArgb(Math.Clamp(alpha + 40, 0, 200), bc), 1.5f);
+                g.FillEllipse(brB, bx - 8, by - 8, 16, 16);
+                g.DrawEllipse(penB, bx - 8, by - 8, 16, 16);
+            }
+
+            // Mascota
+            int mascX = mascota.Animo == EstadoAnimo.Escapando
+                ? (int)mascota.EscapeX
+                : panelJuego.Width / 2;
+            int mascY = panelJuego.Height - 50;
+
+            if (mascota.EscapeVisible)
+                DibujadorMascota.Dibujar(e.Graphics, mascota, mascX, mascY);
+
+            // Overlay pausa
+            if (!timerJuego.Enabled)
+                DibujarOverlay(g, "⏸  PAUSADO", "Presiona PAUSA para continuar",
+                    Color.FromArgb(130, 200, 220, 255),
+                    Color.FromArgb(100, 60, 200));
+
+            // Overlay escapado
+            if (mascota.Animo == EstadoAnimo.Escapando && !mascota.EscapeVisible)
+                DibujarOverlay(g, "🚨 ¡SE ESCAPÓ!",
+                    $"¡{mascota.Nombre} se fue de aburrimiento!\nPresiona RESET para empezar de nuevo",
+                    Color.FromArgb(150, 255, 200, 220),
+                    C_NEON_ROSA);
+        }
+
+        private static void DibujarNube(Graphics g, int cx, int cy, float escala)
+        {
+            using var br = new SolidBrush(Color.FromArgb(200, 255, 255, 255));
+            int r = (int)(30 * escala);
+            g.FillEllipse(br, cx - r, cy - r / 2, r * 2, r);
+            g.FillEllipse(br, cx - r / 2, cy - r, (int)(r * 1.4f), r);
+            g.FillEllipse(br, cx + r / 2 - 5, cy - r / 2, r, r);
+        }
+
+        private void DibujarOverlay(Graphics g, string titulo, string subtitulo,
+                                     Color colorFondo, Color colorTitulo)
+        {
+            using var fondo = new SolidBrush(colorFondo);
+            g.FillRectangle(fondo, 0, 0, panelJuego.Width, panelJuego.Height);
+
+            int rw = 420, rh = 160;
+            int rx = (panelJuego.Width - rw) / 2;
+            int ry = (panelJuego.Height - rh) / 2;
+
+            using var caja = new SolidBrush(Color.FromArgb(220, 255, 250, 255));
+            using var borde = new Pen(C_NEON_ROSA, 2.5f);
+            using var glow = new Pen(Color.FromArgb(80, 255, 100, 180), 7f);
+
+            g.FillRectangle(caja, rx, ry, rw, rh);
+            g.DrawRectangle(borde, rx, ry, rw, rh);
+            g.DrawRectangle(glow, rx, ry, rw, rh);
+
+            var sf = new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Near
+            };
+
+            using var fT = new Font("Consolas", 20f, FontStyle.Bold);
+            using var bT = new SolidBrush(colorTitulo);
+            g.DrawString(titulo, fT, bT,
+                new RectangleF(rx, ry + 14, rw, 55), sf);
+
+            using var fS = new Font("Consolas", 9.5f);
+            using var bS = new SolidBrush(C_TEXTO);
+            g.DrawString(subtitulo, fS, bS,
+                new RectangleF(rx, ry + 75, rw, 80), sf);
+        }
+
+        private void MostrarEscapo()
+        {
+            timerJuego.Stop();
+            btnPausa.Enabled = false;
+            panelJuego.Invalidate();
         }
     }
 }
-
-*/
