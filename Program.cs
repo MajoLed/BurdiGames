@@ -23,6 +23,7 @@ namespace BurdiGames
             BurdiGames.CatalogoJuegos.Add(new Tamagotchi("Tamagotchi", "Cuida tu mascota virtual", "Sources/Imagenes/Tamagotchi/logo.png"));
             BurdiGames.CatalogoJuegos.Add(new JuegoPacman());
             BurdiGames.CatalogoJuegos.Add(new JuegoCoheteArcade());
+            BurdiGames.CatalogoJuegos.Add(new JuegoBuscaminasArcade());
 
             var playerOne = BurdiGames.AutenticarUsuario("PlayerOne", "1234");
 
