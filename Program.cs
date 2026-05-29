@@ -26,22 +26,7 @@ namespace BurdiGames
             BurdiGames.CatalogoJuegos.Add(new JuegoBuscaminasArcade());
             BurdiGames.CatalogoJuegos.Add(new JuegoTamagotchiWrapper());
 
-            var playerOne = BurdiGames.AutenticarUsuario("PlayerOne", "1234");
-
-
-            if (playerOne != null)
-            {
-
-                BurdiGames.CatalogoJuegos.Add(BurdiGames.CatalogoJuegos[0]);
-
-                // Partida de prueba en el historial
-                playerOne.HistorialPartidas.Add(new Partida(playerOne, BurdiGames.CatalogoJuegos[0])
-                {
-                    Puntaje = 12000,
-                    Fecha = DateTime.Now.AddHours(-2)
-                });
-            }
-
+           
 
             //Iniciar aplicacion
             ApplicationConfiguration.Initialize();
