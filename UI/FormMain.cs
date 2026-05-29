@@ -19,6 +19,24 @@ namespace BurdiGames.GUI
         {
             InitializeComponent();
             _usuario = usuario;
+
+            // Cargar las tarjetas de juegos
+            int x = 20;
+            int y = 20;
+            foreach (var juego in Program.BurdiGames.CatalogoJuegos)
+            {
+                var tarjeta = CrearTarjeta(juego);
+                tarjeta.Left = x;
+                tarjeta.Top = y;
+                this.Controls.Add(tarjeta);
+                x += 220; // siguiente tarjeta a la derecha
+                if (x > 600) // si se pasa del ancho, baja a la siguiente fila
+                {
+                    x = 20;
+                    y += 140;
+                }
+            }
+
         }
 
         //private void CargarDatos()

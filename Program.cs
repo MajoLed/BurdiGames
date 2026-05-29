@@ -19,6 +19,9 @@ namespace BurdiGames
             BurdiGames.CatalogoJuegos.Add(new Arcade("Galaxian", "Juego de naves espaciales","Sources/Imagenes/logo_galaxian.png"));
             BurdiGames.CatalogoJuegos.Add(new RPG("Bomberman", "Aventura RPG pixel art", "Sources/Imagenes/logo_bomberman.png") );
             BurdiGames.CatalogoJuegos.Add(new Arcade("Puzzle Block", "Bloques y lógica", "Sources/Imagenes/defaultuser.png"));
+            /*BurdiGames.CatalogoJuegos.Add(new JuegoTamagotchi());*/
+            BurdiGames.CatalogoJuegos.Add(new Tamagotchi("Tamagotchi", "Cuida tu mascota virtual", "Sources/Imagenes/Tamagotchi/logo.png"));
+            BurdiGames.CatalogoJuegos.Add(new JuegoPacman());
 
 
             var playerOne = BurdiGames.AutenticarUsuario("PlayerOne", "1234");
