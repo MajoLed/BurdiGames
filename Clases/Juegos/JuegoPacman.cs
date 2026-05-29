@@ -433,7 +433,16 @@ namespace BurdiGames.Clases.Juegos
                 .Where(t => !mapa.EsPared(t.siguiente))
                 .ToList();
 
-            if (!validas.Any()) return;
+            // FIX: si no hay direcciones válidas sin contar la opuesta,
+            // intentar también la opuesta para no quedar pegado en pared
+            if (!validas.Any())
+            {
+                var opuestaVec = Posicion + DirAVec(opuesta);
+                if (!mapa.EsPared(opuestaVec))
+                    validas.Add((opuesta, opuestaVec));
+                else
+                    return; // completamente rodeado de paredes (no debería ocurrir)
+            }
 
             DireccionPac elegida;
             if (Estado == EstadoFantasma.Asustado || EsAleatorio)
@@ -550,6 +559,7 @@ namespace BurdiGames.Clases.Juegos
         public int Puntuacion { get; private set; }
         public int Nivel { get; private set; }
         public string Estado { get; private set; } = "jugando";
+        public bool Pausado { get; private set; } = false;
 
         private int _comboFantasmas = 0;
         private int _tickContador = 0;
@@ -596,9 +606,15 @@ namespace BurdiGames.Clases.Juegos
 
         public void EncolarDireccion(DireccionPac d) => Jugador.EncolarDireccion(d);
 
+        public void Pausar()
+        {
+            if (Estado == "jugando") Pausado = !Pausado;
+        }
+
         public void Tick()
         {
-            if (Estado != "jugando") return;
+            if (Pausado) return;
+            if (Estado == "gameover" || Estado == "ganaste") return;
 
             if (_pausaMuerte > 0)
             {
@@ -607,6 +623,7 @@ namespace BurdiGames.Clases.Juegos
                 {
                     Jugador.Reiniciar();
                     Fantasmas.ForEach(f => f.Reiniciar());
+                    CambiarEstado("jugando");  // FIX: volver a jugando tras pausa de muerte
                 }
                 return;
             }
@@ -641,9 +658,13 @@ namespace BurdiGames.Clases.Juegos
                 }
                 else
                 {
-                    CambiarEstado("muerto");
+                    // FIX: ActivarMuerte primero, luego decidir el estado correcto
+                    // Evita que "muerto" sobreescriba "gameover" en el overlay
                     bool sobrevivio = Jugador.ActivarMuerte();
-                    if (!sobrevivio) CambiarEstado("gameover");
+                    if (!sobrevivio)
+                        CambiarEstado("gameover");
+                    else
+                        CambiarEstado("muerto");
                     break;
                 }
             }
