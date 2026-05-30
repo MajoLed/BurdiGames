@@ -6,6 +6,7 @@ namespace BurdiGames.GUI
     public partial class FormMain : Form
     {
         private readonly Usuario _usuario;
+        private FormPerfilUsuario? _formPerfil; // referencia para reusar la ventana
 
         private Color colorFondo = Color.FromArgb(8, 6, 20);
         private Color colorCard = Color.FromArgb(25, 15, 45);
@@ -16,6 +17,9 @@ namespace BurdiGames.GUI
         private Color colorTexto = Color.FromArgb(220, 210, 255);
         private Color colorGris = Color.FromArgb(110, 90, 150);
 
+        // Label de bienvenida guardado como campo para poder actualizarlo
+        private Label lblBienvenida = null!;
+
         public FormMain(Usuario usuario)
         {
             InitializeComponent();
@@ -25,14 +29,15 @@ namespace BurdiGames.GUI
             CargarTarjetasJuegos();
         }
 
+        // ─────────────────────────────────────────────────────────────
+        // CONFIGURACIÓN DE LA VENTANA
+        // ─────────────────────────────────────────────────────────────
         private void ConfigurarVentana()
         {
             this.Text = "BURDIGAMES — Catálogo";
             this.Size = new Size(960, 620);
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = colorFondo;
 
-            // Título principal
             var lblTitulo = new Label
             {
                 Text = "BURDIGAMES",
@@ -43,8 +48,7 @@ namespace BurdiGames.GUI
                 Top = 14
             };
 
-            // Bienvenida al usuario
-            var lblBienvenida = new Label
+            lblBienvenida = new Label
             {
                 Text = $"▸  {_usuario.Nombre}",
                 ForeColor = colorNeonCian,
@@ -54,7 +58,25 @@ namespace BurdiGames.GUI
                 Top = 46
             };
 
-            // Botón logout
+            // Botón perfil — abre FormPerfilUsuario
+            var btnPerfil = new Button
+            {
+                Text = "[ PERFIL ]",
+                Width = 100,
+                Height = 32,
+                Top = 18,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = colorFondo,
+                ForeColor = colorNeonCian,
+                Font = new Font("Consolas", 9f, FontStyle.Bold),
+                Cursor = Cursors.Hand,
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
+            };
+            btnPerfil.Left = this.ClientSize.Width - 230;
+            btnPerfil.FlatAppearance.BorderColor = colorNeonCian;
+            btnPerfil.FlatAppearance.BorderSize = 1;
+            btnPerfil.Click += BtnPerfil_Click;
+
             var btnLogout = new Button
             {
                 Text = "[ SALIR ]",
@@ -73,9 +95,38 @@ namespace BurdiGames.GUI
             btnLogout.FlatAppearance.BorderSize = 1;
             btnLogout.Click += (s, e) => this.Close();
 
-            this.Controls.AddRange(new Control[] { lblTitulo, lblBienvenida, btnLogout });
+            this.Controls.AddRange(new Control[] { lblTitulo, lblBienvenida, btnPerfil, btnLogout });
         }
 
+        // ─────────────────────────────────────────────────────────────
+        // ABRIR PERFIL — comunicación bidireccional
+        // ─────────────────────────────────────────────────────────────
+        private void BtnPerfil_Click(object? sender, EventArgs e)
+        {
+            // Si ya está abierto, lo trae al frente en vez de abrir otro
+            if (_formPerfil != null && !_formPerfil.IsDisposed)
+            {
+                _formPerfil.Refrescar();
+                _formPerfil.BringToFront();
+                return;
+            }
+
+            _formPerfil = new FormPerfilUsuario(_usuario);
+
+            // FormPerfilUsuario notifica a FormMain cuando el perfil cambia
+            _formPerfil.PerfilActualizado += (s, args) =>
+            {
+                // Actualiza el label de bienvenida con el nuevo nombre
+                lblBienvenida.Text = $"▸  {_usuario.Nombre}";
+            };
+
+            _formPerfil.FormClosed += (s, args) => _formPerfil = null;
+            _formPerfil.Show();
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        // CATÁLOGO DE JUEGOS
+        // ─────────────────────────────────────────────────────────────
         private void CargarTarjetasJuegos()
         {
             var panel = new FlowLayoutPanel
@@ -107,32 +158,20 @@ namespace BurdiGames.GUI
                 Cursor = Cursors.Hand
             };
 
-            // Borde neón pintado a mano
             card.Paint += (s, e) =>
             {
                 var g = e.Graphics;
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 using var pen = new Pen(colorCardBorde, 1.5f);
                 g.DrawRectangle(pen, 1, 1, card.Width - 3, card.Height - 3);
-
-                // Esquinas brillantes
                 using var penBright = new Pen(colorNeon, 2f);
-                int c = 12; // largo de la esquina
-                // top-left
-                g.DrawLine(penBright, 1, 1, 1 + c, 1);
-                g.DrawLine(penBright, 1, 1, 1, 1 + c);
-                // top-right
-                g.DrawLine(penBright, card.Width - 2 - c, 1, card.Width - 2, 1);
-                g.DrawLine(penBright, card.Width - 2, 1, card.Width - 2, 1 + c);
-                // bottom-left
-                g.DrawLine(penBright, 1, card.Height - 2, 1 + c, card.Height - 2);
-                g.DrawLine(penBright, 1, card.Height - 2 - c, 1, card.Height - 2);
-                // bottom-right
-                g.DrawLine(penBright, card.Width - 2 - c, card.Height - 2, card.Width - 2, card.Height - 2);
-                g.DrawLine(penBright, card.Width - 2, card.Height - 2 - c, card.Width - 2, card.Height - 2);
+                int c = 12;
+                g.DrawLine(penBright, 1, 1, 1 + c, 1); g.DrawLine(penBright, 1, 1, 1, 1 + c);
+                g.DrawLine(penBright, card.Width - 2 - c, 1, card.Width - 2, 1); g.DrawLine(penBright, card.Width - 2, 1, card.Width - 2, 1 + c);
+                g.DrawLine(penBright, 1, card.Height - 2, 1 + c, card.Height - 2); g.DrawLine(penBright, 1, card.Height - 2 - c, 1, card.Height - 2);
+                g.DrawLine(penBright, card.Width - 2 - c, card.Height - 2, card.Width - 2, card.Height - 2); g.DrawLine(penBright, card.Width - 2, card.Height - 2 - c, card.Width - 2, card.Height - 2);
             };
 
-            // Franja superior de color por género
             var lblFranja = new Label
             {
                 Width = 210,
@@ -178,6 +217,24 @@ namespace BurdiGames.GUI
                 Left = 10
             };
 
+            // Puntaje del usuario en este juego
+            var mejorPartida = _usuario.HistorialPartidas
+                .Where(p => p.Juego.Nombre == juego.Nombre && p.Puntaje.HasValue)
+                .OrderByDescending(p => p.Puntaje)
+                .FirstOrDefault();
+
+            var lblPuntaje = new Label
+            {
+                Text = mejorPartida != null ? $"▲ {mejorPartida.Puntaje:N0} pts" : "Sin partidas",
+                ForeColor = mejorPartida != null ? colorNeonCian : colorGris,
+                Font = new Font("Consolas", 7f),
+                AutoSize = false,
+                Width = 190,
+                Height = 14,
+                Top = 94,
+                Left = 10
+            };
+
             var btnJugar = new Button
             {
                 Text = "▶ JUGAR",
@@ -201,6 +258,10 @@ namespace BurdiGames.GUI
                     Fecha = DateTime.Now
                 };
                 _usuario.HistorialPartidas.Add(partida);
+
+                // Refresca el perfil si está abierto
+                _formPerfil?.Refrescar();
+
                 juego.Jugar();
             };
 
@@ -226,26 +287,25 @@ namespace BurdiGames.GUI
                     "INFO", MessageBoxButtons.OK, MessageBoxIcon.None);
             };
 
-            card.Controls.AddRange(new Control[] { lblFranja, lblNombre, lblGenero, lblDesc, btnJugar, btnInfo });
+            card.Controls.AddRange(new Control[] { lblFranja, lblNombre, lblGenero, lblDesc, lblPuntaje, btnJugar, btnInfo });
             return card;
         }
 
-        // Cada género tiene su propio color de acento
         private Color ObtenerColorGenero(string genero)
         {
             return genero?.ToLower() switch
             {
-                "arcade" => Color.FromArgb(0, 220, 255),   // cian
-                "rpg" => Color.FromArgb(180, 60, 255),  // morado
-                "simulación" => Color.FromArgb(255, 180, 0),   // ámbar
+                "arcade" => Color.FromArgb(0, 220, 255),
+                "rpg" => Color.FromArgb(180, 60, 255),
+                "puzzle" => Color.FromArgb(0, 255, 127),
+                "simulación" => Color.FromArgb(255, 180, 0),
                 "simulacion" => Color.FromArgb(255, 180, 0),
-                "acción" => Color.FromArgb(255, 60, 100),  // rojo neón
+                "acción" => Color.FromArgb(255, 60, 100),
                 "accion" => Color.FromArgb(255, 60, 100),
-                _ => Color.FromArgb(220, 50, 180),  // rosa por defecto
+                _ => Color.FromArgb(220, 50, 180),
             };
         }
 
-        // Línea de degradado superior
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
