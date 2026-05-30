@@ -6,7 +6,7 @@
 
 ### Proyecto Final — Fundamentos de Programación
 
-**2025**
+**2026**
 
 #### **Integrantes:** Maria José Ledesma Cordoba, Laura Camila Heredia Uribe, Valentina Velez Cano, Samuel Botero Gallo
 
