@@ -108,33 +108,38 @@ namespace BurdiGames
             };
         }
 
-
         private void btnRegistrarte_Click(object sender, EventArgs e)
         {
-            string nombre = txtUsuario.Text.Trim();
-            string pass = txtPassword.Text;
+            string nickname = txtRegNombre.Text.Trim();
+            string email = txtRegEmail.Text.Trim();
+            string pass = txtRegPass.Text;
 
-            if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(pass))
+            if (string.IsNullOrWhiteSpace(nickname) || string.IsNullOrWhiteSpace(pass))
             {
-                MessageBox.Show("Completa todos los campos.", "Aviso",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                lblRegMsg.ForeColor = Color.FromArgb(220, 50, 50);
+                lblRegMsg.Text = "Completa los campos obligatorios.";
                 return;
             }
 
-            bool ok = Program.BurdiGames.RegistrarUsuario(nombre, pass);
+            bool ok = Program.BurdiGames.RegistrarUsuario(nickname, pass);
 
             if (!ok)
             {
-                MessageBox.Show("Ese nombre de usuario ya existe.", "Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                lblRegMsg.ForeColor = Color.FromArgb(220, 50, 50);
+                lblRegMsg.Text = "Ese nombre de usuario ya existe.";
                 return;
             }
 
-            MessageBox.Show($"¡Cuenta creada! Ya puedes iniciar sesión, {nombre}.",
-                "Registro exitoso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            lblRegMsg.ForeColor = Color.FromArgb(0, 200, 100);
+            lblRegMsg.Text = $"¡Cuenta creada, {nickname}!";
 
-            txtUsuario.Clear();
-            txtPassword.Clear();
+            // Limpiar y volver al tab login
+            txtRegNombre.Clear();
+            txtRegEmail.Clear();
+            txtRegPass.Clear();
+
+            Task.Delay(1500).ContinueWith(_ =>
+                Invoke(() => tabModo.SelectedIndex = 0));
         }
 
         private void bgTxtContrasenia_Paint(object sender, PaintEventArgs e)

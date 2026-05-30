@@ -687,10 +687,6 @@ namespace BurdiGames.Clases.Juegos
         }
     }
 
-    // ============================================================
-    //  CLASE JUEGO PACMAN — conecta con el sistema del proyecto
-    //  Hereda de Juego (clase abstracta del proyecto)
-    // ============================================================
     internal class JuegoPacman : Arcade
     {
         public JuegoPacman()
@@ -702,7 +698,7 @@ namespace BurdiGames.Clases.Juegos
         {
         }
 
-        // Sobreescribe Jugar() — polimorfismo sobre Arcade que sobreescribe Juego
+        //polimorfismo sobre Arcade que sobreescribe Juego
         public override void Jugar()
         {
             var formPacman = new FormPacman();

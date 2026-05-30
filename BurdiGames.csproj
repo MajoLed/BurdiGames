@@ -9,7 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Auxiliares\" />
+    <Compile Remove="Auxiliares\**" />
+    <EmbeddedResource Remove="Auxiliares\**" />
+    <None Remove="Auxiliares\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Sources\json\" />
     <Folder Include="Sources\Sonidos\" />
   </ItemGroup>
