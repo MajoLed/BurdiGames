@@ -20,8 +20,8 @@ La plataforma cuenta con inicio de sesión, un catálogo visual de juegos con ta
 
 ### Los cuatro minijuegos incluidos
 
-- **Pac-Girl Rosa** — versión kawaii del clásico Pac-Man, con fantasmas de colores pastel y power-ups en forma de corazón.
-- **Cohete Espacial** — shooter vertical donde se esquivan meteoritos rosas y se eliminan aliens maquillados que lanzan corazones verdes.
+- **Pac man Rosa** — Juego Arcade Pac-Man come puntos, evita fantasmas y usa corazones de poder.
+- **Cohete Espacial** — Esquiva meteoritos rosas y elimina aliens maquillados en el espacio. utiliza a,d para ir derecha e izquierda y w, s para ir arriba y abajo. y con Enter Disparas.
 - **Blossom Mines** — Buscaminas con estética girlie: celdas rosas, banderas moradas y overlay de victoria floral.
 - **Tamagotchi** — mascota virtual con pantalla de configuración inicial (nombre, tipo y género), estadísticas de hambre, energía y felicidad, y un sistema de escape si se abandona.
 
